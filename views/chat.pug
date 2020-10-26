@@ -1,0 +1,37 @@
+extends layout
+
+block scripts
+  link(rel='stylesheet', href='/stylesheets/chat.css')
+
+  script(src="/socket.io/socket.io.js")
+  script(src="/javascripts/chat.js" type="text/javascript")
+
+block content
+  header
+    h1= title
+    p Inserisci un nome per iniziare!
+
+  .container
+    div
+      form#login.form-inline(autocomplete="off")
+        input#name(type="text" name="name" class="form-control ml-2 mb-2" 
+          placeholder="Your name" maxlength="8" required)
+        input(type="submit" class="btn btn-primary ml-2 mb-2" value="Submit")
+
+    main.d-none
+      div
+        p.mb-0 Attualmente connessi:
+        ul#members.list-inline.ml-2
+
+      div#messages
+
+      form#chat-form(autocomplete="off")
+        div.form-group
+          label(for="msg")
+          textarea#text-msg.form-control(name="msg", cols="30", rows="3" required)
+        div 
+          input(type="submit", value="Invia", class="btn btn-primary")
+
+  //-
+    footer.footer
+      span Sito gestito da 13
