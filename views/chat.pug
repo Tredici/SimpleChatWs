@@ -26,9 +26,16 @@ block content
       div#messages
 
       form#chat-form(autocomplete="off")
-        div.form-group
+  
+        div.form-group.mb-1
           label(for="msg")
           textarea#text-msg.form-control(name="msg", cols="30", rows="3" required)
+        .input-group.mb-1
+          .custom-file
+            input#file-msg.custom-file-input(type="file" multiple="")
+            label.custom-file-label(for="inputGroupFile02") Choose file
+          //-.input-group-append
+            span.input-group-text Upload
         div 
           input(type="submit", value="Invia", class="btn btn-primary")
 
