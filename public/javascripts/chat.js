@@ -37,7 +37,7 @@ function addMsg(msg) {
             let newFile = new File(file.content, file.name)
             a.href = URL.createObjectURL(newFile)
             a.textContent = file.name
-            a.download = ""
+            a.download = file.name
 
             fileList.append(li)
         }
