@@ -43,11 +43,19 @@ function addMsg(msg) {
         }
         divMsg.append(fileList)
     }
+    // audio
+    if(msg.msg.audio) {
+        let audio = document.createElement("audio")
+        let audioBlob = new Blob(msg.msg.audio)
+        audio.src = URL.createObjectURL(audioBlob)
+        audio.controls = true
+        divMsg.append(audio)
+    }
 
     
     return divMsg
 }
-
+let audio_msg = undefined
 $(
     async () => {
 
@@ -75,16 +83,112 @@ $(
                 })
 
                 /**
+                 * Controllo del bottone per registrare
+                 *  audio
+                 */
+                function initRecording() {
+                    $("button#audio-msg").click(async e => {
+                        //per evitare il problema della doppia chiamata
+                        $("button#audio-msg").off()
+                        let button = document.getElementById('audio-msg')
+                        
+                        button.disabled = true
+                        audio_msg = undefined
+                        let stream
+                        let constraints = { audio: true, video: false }
+                        try {
+                            stream = await navigator.mediaDevices
+                            .getUserMedia(constraints)
+                        } catch(err) {
+                            button.disabled = false
+                            console.error(err)
+                            return
+                        }
+                        /**
+                         * Registratore dell'audio
+                         */
+                        let mediaRecorder = new MediaRecorder(stream)
+                        /**
+                         * Array dell'audio registrato
+                         */
+                        let recordedAudio = []
+                        mediaRecorder.ondataavailable = (e) => {
+                            recordedAudio.push(e.data)
+                        }
+
+                        mediaRecorder.start()
+                        button.disabled = false
+                        button.textContent = "Ferma"
+                        $('form#chat-form input[type="submit"]')[0].disabled = true
+                        /**
+                         * Sospende la funazione fino al prossimo click
+                         */
+                        await new Promise(resolve => {
+                            button.addEventListener('click', e => {
+                                e.preventDefault()
+                                e.stopPropagation()
+                                mediaRecorder.stop()
+                                stream.getTracks().forEach(track => track.stop())
+                                /**
+                                 * porcata per ottenere i dati
+                                 * della registrazione
+                                 */
+                                window.setTimeout(resolve, 0)
+                            }, {
+                                capture: true,
+                                once: true
+                            })
+                        })
+                        /**
+                         * rende globalmente accessibili i 
+                         */
+                        audio_msg = recordedAudio
+                        let audioBlob = new Blob(recordedAudio)
+                        let audio = document.createElement('audio')
+                        audio.id = "audio-msg"
+                        audio.controls = true
+                        audio.src = URL.createObjectURL(audioBlob)
+                        button.parentElement.replaceChild(audio, button)
+                        
+                        $('form#chat-form input[type="submit"]')[0].disabled = false
+                    })
+                }
+                initRecording()
+                
+                /**
+                 * Per gestire il reset della form
+                 */
+                $('#chat-form').on('reset', e => {
+                    /**
+                     * Reset dell'audio
+                     */
+                    audio_msg = undefined
+                    /**
+                     * Crea un nuovo bottone per le registrazioni
+                     */
+                    let button = document.createElement('button')
+                    button.id = "audio-msg"
+                    button.textContent = "Registra"
+                    $("#audio-msg").replaceWith(button)
+                    // reset dell'audio
+                    initRecording()
+                })
+                /**
                  * Codice per l'upload di nuovi messaggi
                  */
                 $('#chat-form').submit(async e => {
                     e.preventDefault()
                     let form = e.currentTarget
-                    //let data = new FormData(form)
+                    /**
+                     * Per trasferire il testo
+                     */
                     let text_msg = $('#text-msg').val().trim()
                     let data = {
                         text: text_msg
                     }
+                    /**
+                     * Per gli eventuali file allegati
+                     */
                     const filelist = $('#file-msg')[0].files
                     if(filelist.length) {
                         data.files = []
@@ -110,6 +214,12 @@ $(
                             data.files.push(file)
                         }
 
+                    }
+                    /**
+                     * Per gestire le eventuali registrazioni audio
+                     */
+                    if(audio_msg) {
+                        data.audio = audio_msg
                     }
                     socket.emit("msg", data)
                     form.reset()
