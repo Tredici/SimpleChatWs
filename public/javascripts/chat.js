@@ -64,8 +64,8 @@ $(
                         }
 
                         mediaRecorder.start()
-                        button.disabled = false
                         button.textContent = "Ferma"
+                        button.disabled = false
                         $('form#chat-form input[type="submit"]')[0].disabled = true
                         /**
                          * Sospende la funazione fino al prossimo click
