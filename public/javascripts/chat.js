@@ -167,6 +167,11 @@ $(
                     if(audio_msg) {
                         data.audio = audio_msg
                     }
+
+                    /**
+                     * Timestamp inoltro
+                     */
+                    data.ts_send = Date.now()
                     socket.emit("msg", data)
                     form.reset()
                 })

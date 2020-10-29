@@ -12,7 +12,8 @@ function addMsg(msg) {
     // Creazione del contenitore
     let divMsg = document.createElement("div")
     divMsg.classList.add("msg", "border", "rounded", 
-        "mb-2", "bg-primary", "text-white", "p-2")
+        "mb-2", "bg-primary", "text-white", "p-2",
+        "clearfix")
 
     let name = document.createElement("p")
     name.classList.add("font-weight-bold", "msg-content", "mb-1")
@@ -54,6 +55,17 @@ function addMsg(msg) {
         audio.src = URL.createObjectURL(audioBlob)
         audio.controls = true
         divMsg.append(audio)
+    }
+    
+    // orario
+    if(msg.msg.ts_send) {
+        let timestamp = document.createElement("span")
+        timestamp.classList.add("float-right", "ts-msg", "small")
+        let ts = new Date(msg.msg.ts_send)
+        timestamp.textContent = ts.getDate()+"/"+(ts.getMonth()+1)
+            +"/"+ts.getFullYear()+" "
+            +ts.getHours()+":"+ts.getMinutes()+":"+ts.getSeconds()
+        divMsg.append(timestamp)
     }
     
     return divMsg
