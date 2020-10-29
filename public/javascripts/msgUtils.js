@@ -49,12 +49,14 @@ function addMsg(msg) {
     }
     // audio
     if(msg.msg.audio) {
+        let auDiv = document.createElement("div")
         let audio = document.createElement("audio")
         audio.classList.add("mb-1")
         let audioBlob = new Blob(msg.msg.audio)
         audio.src = URL.createObjectURL(audioBlob)
         audio.controls = true
-        divMsg.append(audio)
+        auDiv.append(audio)
+        divMsg.append(auDiv)
     }
     
     // orario
