@@ -51,6 +51,11 @@ module.exports = function(http) {
             data.name = login_data.name
 
             /**
+             * Si unisce alla room per la chat globale
+             */
+            ws.join('global-chat')
+
+            /**
              * Dati che descrivono il ws che si sta
              *  unendo
              */
@@ -59,17 +64,18 @@ module.exports = function(http) {
                 name: data.name
             }
             
-
             /**
-             * 
+             * Broadcast di un nuovo messaggio
              */
-            ws.on("msg", (msg) => {
+            ws.on("msg", (msg, done) => {
                 let new_msg = {
                     auth: users.get(ws).name,
                     msg: msg
                 }
-
-                sendAll("new-msg", new_msg)
+                // invia prima a tutti gli altri
+                ws.to('global-chat').emit("new-msg", new_msg)
+                // poi conferma l'invio
+                done(new_msg)
             })
 
             /**

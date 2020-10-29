@@ -25,6 +25,7 @@ $(
                  */
                 socket.on('new-msg', msg => {
                     let msgDiv = addMsg(msg)
+                    msgDiv.classList.add("mr-4", "bg-secondary")
                     $("#messages").append(msgDiv)
                 })
 
@@ -172,7 +173,19 @@ $(
                      * Timestamp inoltro
                      */
                     data.ts_send = Date.now()
-                    socket.emit("msg", data)
+                    /**
+                     * Invia il messaggio a tutti gli altri
+                     * e poi lo aggiunge anche nella chat corrente
+                     */
+                    socket.emit("msg", data, (msg) => {
+                        /**
+                         * Personalizza il messaggio per il
+                         * sender
+                         */
+                        let msgDiv = addMsg(msg)
+                        msgDiv.classList.add("ml-4")
+                        $("#messages").append(msgDiv)
+                    })
                     form.reset()
                 })
 
