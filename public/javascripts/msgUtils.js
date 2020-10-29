@@ -4,6 +4,21 @@
  *  la creazione di nuovi messaggi   
  */
 
+/**
+ * 
+ * @param {*} msg 
+ */
+function makeAudioDiv(audioArray) {
+    let auDiv = document.createElement("div")
+    let audio = document.createElement("audio")
+    audio.classList.add("mb-1")
+    let audioBlob = new Blob(audioArray)
+    audio.src = URL.createObjectURL(audioBlob)
+    audio.controls = true
+    auDiv.append(audio)
+    return audio
+}
+
 /** Crea un div che rappresenta il messaggio appena ricevuto
  * 
  * @param {object} msg 
@@ -49,12 +64,8 @@ function addMsg(msg) {
     }
     // audio
     if(msg.msg.audio) {
-        let audio = document.createElement("audio")
-        audio.classList.add("mb-1")
-        let audioBlob = new Blob(msg.msg.audio)
-        audio.src = URL.createObjectURL(audioBlob)
-        audio.controls = true
-        divMsg.append(audio)
+        let auDiv = makeAudioDiv(msg.msg.audio)
+        divMsg.append(auDiv)
     }
     
     // orario
