@@ -48,6 +48,7 @@ $(
                             .getUserMedia(constraints)
                         } catch(err) {
                             button.disabled = false
+                            button.classList.add('btn-danger')
                             console.error(err)
                             return
                         }
@@ -64,6 +65,7 @@ $(
                         }
 
                         mediaRecorder.start()
+                        button.classList.add('btn-warning')
                         button.textContent = "Ferma"
                         button.disabled = false
                         $('form#chat-form input[type="submit"]')[0].disabled = true
@@ -90,11 +92,8 @@ $(
                          * rende globalmente accessibili i 
                          */
                         audio_msg = recordedAudio
-                        let audioBlob = new Blob(recordedAudio)
-                        let audio = document.createElement('audio')
+                        let audio = makeAudioDiv(recordedAudio)
                         audio.id = "audio-msg"
-                        audio.controls = true
-                        audio.src = URL.createObjectURL(audioBlob)
                         button.parentElement.replaceChild(audio, button)
                         
                         $('form#chat-form input[type="submit"]')[0].disabled = false
@@ -114,6 +113,7 @@ $(
                      * Crea un nuovo bottone per le registrazioni
                      */
                     let button = document.createElement('button')
+                    button.classList.add("btn","btn-success")
                     button.id = "audio-msg"
                     button.type = "button"
                     button.textContent = "Registra"
