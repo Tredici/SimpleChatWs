@@ -64,8 +64,8 @@ $(
                         }
 
                         mediaRecorder.start()
-                        button.disabled = false
                         button.textContent = "Ferma"
+                        button.disabled = false
                         $('form#chat-form input[type="submit"]')[0].disabled = true
                         /**
                          * Sospende la funazione fino al prossimo click
@@ -115,6 +115,7 @@ $(
                      */
                     let button = document.createElement('button')
                     button.id = "audio-msg"
+                    button.type = "button"
                     button.textContent = "Registra"
                     $("#audio-msg").replaceWith(button)
                     // reset dell'audio
