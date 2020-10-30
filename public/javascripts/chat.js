@@ -2,6 +2,7 @@ const data = {}
 const socket = io()
 
 let audio_msg = undefined
+let pic_msg = []
 $(
     async () => {
 
@@ -105,10 +106,13 @@ $(
                  * Per gestire il reset della form
                  */
                 $('#chat-form').on('reset', e => {
-                    /**
-                     * Reset dell'audio
+                    /** Reset dell'audio
                      */
                     audio_msg = undefined
+                    /** Reset dell'elemento riferimento per le
+                     *  collezioni
+                     */
+                    pic_msg = []
                     /**
                      * Crea un nuovo bottone per le registrazioni
                      */
