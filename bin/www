@@ -4,9 +4,9 @@
  * Module dependencies.
  */
 
+let path = require('path')
 var app = require('../app');
 var debug = require('debug')('simplechatws:server');
-var http = require('http');
 var socket = require('./socket');
 
 /**
@@ -19,9 +19,58 @@ app.set('port', port);
 /**
  * Create HTTP server.
  */
-
-var server = http.createServer(app);
-var io = socket(server);
+let http_module;
+let server;
+/** Scelta di HTTP o HTTPS a seconda dei parametri
+ *  passati all'avvio
+ */
+if(process.env.HTTPS !== undefined)
+{
+  /** Cartella di default dove cercare i certificati
+   */
+  let certs_dir = 'https_certs'
+  /** altrimenti li ricerca nel path fornito
+   */
+  if(process.env.HTTPS !== "") {
+    certs_dir = process.env.HTTPS
+  }
+  debug("Protocol: ", "HTTPS")
+  /** Per leggere i file con i certificati
+   */
+  let fs = require('fs')
+  /** modulo per https
+   */
+  http_module = require('https');
+  /** Opzioni per individuare i cerficati
+   */
+  let https_opt
+  try {
+    https_opt = {
+      key: fs.readFileSync(path.join(certs_dir,'server.key')),
+      cert: fs.readFileSync(path.join(certs_dir,'server.crt'))
+    }
+  } catch (e) {
+    console.error("Cannot read certs files:",e)
+    process.exit(1)
+  }
+  /** Creazione effettiva dei certificati
+   */
+  server = http_module.createServer(https_opt, app);
+}
+else
+{
+  debug("Protocol: ", "HTTP")
+  /** modulo per http
+   */
+  http_module = require('http');
+  /** Creazione di un semplice server http
+   */
+  server = http_module.createServer(app);
+}
+/**
+ * lega Socket.io al server web appena inizializzato
+ */
+let io = socket(server);
 
 /**
  * Listen on provided port, on all network interfaces.
