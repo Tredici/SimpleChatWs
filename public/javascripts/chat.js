@@ -123,9 +123,10 @@ $(
                  * Per gestire il reset della form
                  */
                 $('#chat-form').on('reset', e => {
+                    let form = e.currentTarget
                     /** Reset del carousel
                      */
-                    $("#carousel").empty()
+                    $(".carousel-space", form).empty()
                     /** Reset dell'audio
                      */
                     audio_msg = undefined

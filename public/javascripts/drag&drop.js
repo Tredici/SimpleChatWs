@@ -7,11 +7,11 @@
 /** Posiziona il carousel in cima alla form
  * @param {*} images 
  */
-function initCarousel(form, images) {
+function initCarousel(element, images) {
     // Svuota
-    $("#carousel", form).empty()
+    $(".carousel-space", element).empty()
     // Individua dove mettere il carousel
-    let place = $("#carousel", form)[0]
+    let place = $(".carousel-space", element)[0]
     // Costruisce il carousel
     let carousel = buildCarousel(images)
     // Lo posiziona
@@ -19,6 +19,25 @@ function initCarousel(form, images) {
     // Lo avvia
     $('.carousel', place).carousel()
     return place
+}
+
+/** Genera una stringa pseudocasuale
+ */
+function randomId() {
+    return "controls-"+Math.random().toString().substr(2)
+}
+
+function buildArrow(carouselID, direction) {
+    let aArrow = document.createElement('a')
+    aArrow.href = "#"+carouselID
+    aArrow.setAttribute("role", "button")
+    aArrow.dataset.slide = direction
+    aArrow.classList.add('carousel-control-'+direction)
+    let spanArrow = document.createElement('span')
+    aArrow.append(spanArrow)
+    spanArrow.classList.add('carousel-control-'+direction+'-icon')
+    spanArrow.setAttribute('aria-hidden', "true")
+    return aArrow
 }
 
  /** Realizza il carousel di immagini da
@@ -29,8 +48,9 @@ function initCarousel(form, images) {
 function buildCarousel(images) {
     if(!Array.isArray(images)) throw new Error("")
 
+    let carouselID = randomId()
     let carDiv = document.createElement('div')
-    carDiv.id = "controls"
+    carDiv.id = carouselID
     carDiv.classList.add("carousel", "slide")
     //carDiv.dataset.ride = "carousel"
 
@@ -58,32 +78,10 @@ function buildCarousel(images) {
 
     /** Aggiunta dei bottoni per lo scorrimento tra le immagini
      */
-    {
-        // sinistra
-        let aPrev = document.createElement('a')
-        aPrev.href = "#controls"
-        aPrev.setAttribute("role", "button")
-        aPrev.dataset.slide = "prev"
-        aPrev.classList.add('carousel-control-prev')
-        let frecciaSinistra = document.createElement('span')
-        aPrev.append(frecciaSinistra)
-        frecciaSinistra.classList.add('carousel-control-prev-icon')
-        frecciaSinistra.setAttribute('aria-hidden', "true")
-        carDiv.append(aPrev)
-    }
-    {
-        // destra
-        let aNext = document.createElement('a')
-        aNext.href = "#controls"
-        aNext.setAttribute("role", "button")
-        aNext.dataset.slide = "next"
-        aNext.classList.add('carousel-control-next')
-        let frecciaDestra = document.createElement('span')
-        aNext.append(frecciaDestra)
-        frecciaDestra.classList.add('carousel-control-next-icon')
-        frecciaDestra.setAttribute('aria-hidden', "true")
-        carDiv.append(aNext)
-    }
+    let leftArrow = buildArrow(carouselID, 'prev')
+    carDiv.append(leftArrow)
+    let rightArrow = buildArrow(carouselID, 'next')
+    carDiv.append(rightArrow)
     
     return carDiv
 }
