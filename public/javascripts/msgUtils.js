@@ -10,13 +10,13 @@
  */
 function makeAudioDiv(audioArray) {
     let auDiv = document.createElement("div")
+    auDiv.classList.add("mb-1")
     let audio = document.createElement("audio")
-    audio.classList.add("mb-1")
     let audioBlob = new Blob(audioArray)
     audio.src = URL.createObjectURL(audioBlob)
     audio.controls = true
     auDiv.append(audio)
-    return audio
+    return auDiv
 }
 
 /** Crea un div che rappresenta il messaggio appena ricevuto
