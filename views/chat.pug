@@ -4,6 +4,7 @@ block scripts
   link(rel='stylesheet', href='/stylesheets/chat.css')
 
   script(src="/socket.io/socket.io.js")
+  script(src="/javascripts/drag&drop.js" type="text/javascript")
   script(src="/javascripts/msgUtils.js" type="text/javascript")
   script(src="/javascripts/chat.js" type="text/javascript")
 
@@ -27,6 +28,7 @@ block content
       div#messages
 
       form#chat-form.msg-form.pt-1(autocomplete="off")
+        #carousel
         div.form-group.mb-1
           //- label(for="msg") Testo
           textarea#text-msg.form-control(name="msg", cols="30", rows="3" required)

@@ -102,10 +102,30 @@ $(
                 }
                 initRecording()
                 
+                /** Per il drag&drop
+                 */
+                $('#chat-form').on("dragenter", e => e.preventDefault())
+                $('#chat-form').on("dragover", e => e.preventDefault())
+                $('#chat-form').on("drop", async e => {
+                    let form = e.currentTarget
+                    e.preventDefault()
+                    console.log(e)
+                    let draggedFiles = e.originalEvent.dataTransfer.files
+                    let imageFiles = []
+                    for(let f of draggedFiles) {
+                        if(!f.type.startsWith("image/")) continue
+                        imageFiles.push(f)
+                    }
+                    initCarousel(form, imageFiles)
+                })
+
                 /**
                  * Per gestire il reset della form
                  */
                 $('#chat-form').on('reset', e => {
+                    /** Reset del carousel
+                     */
+                    $("#carousel").empty()
                     /** Reset dell'audio
                      */
                     audio_msg = undefined
