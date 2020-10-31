@@ -4,6 +4,54 @@
  *  la creazione di nuovi messaggi   
  */
 
+/** Dato che Blob e file non si possono trasmettere naturalmente
+ *  Socket.io questa funzione serve a convertirli in oggetti 
+ *  "equivalenti" che ne contengono il contenuto in ArrayBuffer
+ *  e i vari metadati associati.
+ * 
+ *  Ogni File viene tradotto in un oggetto con la seguente struttura:
+ *  {
+ *      name, 
+ *      type, 
+ *      content
+ * } 
+ * 
+ * @param {Array<File>} fileList 
+ */
+async function makeFileEquivalentObject(filelist) {
+    let ans = []
+    for(let fileToRead of filelist) {
+        let reader = new FileReader()
+        let fileBuffer = await new Promise((resolve, reject) => {
+            reader.onload = function(evt) {
+                resolve([evt.target.result])
+            }
+            reader.onerror = reject
+            reader.readAsArrayBuffer(fileToRead)
+        })
+        const file = {
+            name: fileToRead.name,
+            type: fileToRead.type,
+            content: fileBuffer
+        }
+        /**
+         * Aggiunge alla risposta il file appena caricato,
+         * mi tengo tranquillo per un eventuale di invio di
+         * più file insieme
+         */
+        ans.push(file)
+    }
+
+    return ans
+}
+
+/** Fa il lavoro inverso della funzione precedente
+ * @param {*} feq 
+ */
+function makeFileFromEquivalentObject(feq) {
+    return new File(feq.content, feq.name)
+}
+
 /**
  * 
  * @param {*} msg 
@@ -29,11 +77,26 @@ function addMsg(msg) {
     divMsg.classList.add("msg", "border", "rounded", 
         "mb-2", "bg-primary", "text-white", "p-2",
         "clearfix")
-
+    // Nome di chi ha inviato il messaggio
     let name = document.createElement("p")
     name.classList.add("font-weight-bold", "msg-content", "mb-1")
     name.textContent = msg.auth
     divMsg.append(name)
+
+    //Carousel
+    if(msg.msg.carousel) {
+        let images = msg.msg.carousel.map(makeFileFromEquivalentObject)
+        let msgCarousel = document.createElement('div')
+        msgCarousel.classList.add("carousel-space")
+        divMsg.append(msgCarousel)
+        /** Porcata da fare perché mi serve aspettare che sia connesso
+         *  al DOM
+         */
+        let id = setTimeout(() => {
+            clearTimeout(id)
+            initCarousel(divMsg, images)
+        },0)
+    }
 
     // contenuto testuale
     if(msg.msg.text) {
@@ -53,10 +116,10 @@ function addMsg(msg) {
             //a.classList.add("text-white")
             li.append(a)
             
-            let newFile = new File(file.content, file.name)
+            let newFile = makeFileFromEquivalentObject(file)
             a.href = URL.createObjectURL(newFile)
-            a.textContent = file.name
-            a.download = file.name
+            a.textContent = newFile.name
+            a.download = newFile.name
 
             fileList.append(li)
         }

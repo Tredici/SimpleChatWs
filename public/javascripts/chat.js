@@ -117,6 +117,7 @@ $(
                         imageFiles.push(f)
                     }
                     initCarousel(form, imageFiles)
+                    pic_msg = imageFiles
                 })
 
                 /**
@@ -164,35 +165,19 @@ $(
                      */
                     const filelist = $('#file-msg')[0].files
                     if(filelist.length) {
-                        data.files = []
-                        for(let fileToRead of filelist) {
-                            let reader = new FileReader()
-                            let fileBuffer = await new Promise((resolve, reject) => {
-                                reader.onload = function(evt) {
-                                    resolve([evt.target.result])
-                                }
-                                reader.onerror = reject
-                                reader.readAsArrayBuffer(fileToRead)
-                            })
-                            const file = {
-                                name: fileToRead.name,
-                                type: fileToRead.type,
-                                content: fileBuffer
-                            }
-                            /**
-                             * Aggiunge alla risposta il file appena caricato,
-                             * mi tengo tranquillo per un eventuale di invio di
-                             * più file insieme
-                             */
-                            data.files.push(file)
-                        }
-
+                        data.files = await makeFileEquivalentObject(filelist)
                     }
                     /**
                      * Per gestire le eventuali registrazioni audio
                      */
                     if(audio_msg) {
                         data.audio = audio_msg
+                    }
+
+                    /** Per gestire l'eventuale carousel di foto
+                     */
+                    if(pic_msg) {
+                        data.carousel = await makeFileEquivalentObject(pic_msg)
                     }
 
                     /**

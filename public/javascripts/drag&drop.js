@@ -17,7 +17,11 @@ function initCarousel(element, images) {
     // Lo posiziona
     place.append(carousel)
     // Lo avvia
-    $('.carousel', place).carousel()
+    $('.carousel', place).carousel({
+        interval: 5000,
+        pause: 'hover',
+        ride: 'carousel'
+    })
     return place
 }
 
@@ -38,6 +42,20 @@ function buildArrow(carouselID, direction) {
     spanArrow.classList.add('carousel-control-'+direction+'-icon')
     spanArrow.setAttribute('aria-hidden', "true")
     return aArrow
+}
+
+/** Realizza e ritorna un "div.carousel-item"
+ * 
+ * @param {Files} image
+ */
+function buildCarouselItem(image) {
+    let item = document.createElement('div')
+    item.classList.add("carousel-item")
+    let img = document.createElement('img')
+    img.src = URL.createObjectURL(image)
+    img.classList.add('w-100', 'd-block')
+    item.append(img)
+    return item
 }
 
  /** Realizza il carousel di immagini da
@@ -62,16 +80,11 @@ function buildCarousel(images) {
      */
     let active = false
     for(let image of images) {
-        let item = document.createElement('div')
-        item.classList.add("carousel-item")
+        let item = buildCarouselItem(image)
         if(!active) {
             item.classList.add("active")
             active = true
         }
-        let img = document.createElement('img')
-        img.src = URL.createObjectURL(image)
-        img.classList.add('w-100')
-        item.append(img)
 
         carInner.append(item)
     }
