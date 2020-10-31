@@ -1,11 +1,25 @@
 const data = {}
 const socket = io()
+/** Per errori di connessione
+ */
+socket.on('connect_error', (error) => {
+    let message = infoMsg('error', "[connect_error] "
+        +error)
+    $("#start").append(message)
+})
+/** Per timeout nella connessione
+ */
+socket.on('connect_timeout', (timeout) => {
+    let message = infoMsg('error', "[connect_timeout] "
+        +timeout)
+    $("#start").append(message)
+})
 
 let audio_msg = undefined
 let pic_msg = undefined
 $(
     async () => {
-
+        
         $('#login').submit(e => {
             e.preventDefault()
             let name = $('#name').val()
@@ -13,16 +27,52 @@ $(
             $('form#login input').prop("disabled",true)
             $('form#login input[type="submit"]').remove()
             data.name = name
-
+            
             /**
              * Invia al server il proprio nome e riceve indietro l'elenco
              * di tutti gli utenti collegati al momento
              */
             socket.emit('logged', {name: name}, (users) => {
                 //  Da eseguire dopo il login
+                /**
+                 * Rende visibile la zona per per chattare
+                 */
                 $("main").removeClass('d-none')
                 /**
-                 * Per la ricezione di messaggi
+                 * Visualizza il messaggio che evidenzia che
+                 *  la connessione è stata stabilita
+                 */
+                let loginMessage = infoMsg('info', 'logged!')
+                $("#messages").append(loginMessage)
+                
+                /** Per avvertire che ci si è disconnessi
+                 */
+                socket.on('disconnect', (reason) => {
+                    let message = infoMsg('info', '[disconnected] '
+                        +reason)
+                    $("#messages").append(message)
+                })
+                /** Per i tentativi di riconnessione
+                 */
+                socket.on('reconnecting', (attemptNumber) => {
+                    let message = infoMsg('info', '[reconnecting] '
+                        +attemptNumber)
+                    $("#messages").append(message)
+                })
+                /** Per riconnessione fallita
+                 */
+                socket.on('reconnect_failed', () => {
+                    let message = infoMsg('info', '[reconnect_failed]')
+                    $("#messages").append(message)
+                })
+                /** Per errori nel funzionamento
+                 */
+                socket.on('error', (error) => {
+                    let message = infoMsg('error', "[error] "+error)
+                    $("#messages").append(message)
+                })
+
+                /** Per la ricezione di messaggi
                  */
                 socket.on('new-msg', msg => {
                     let msgDiv = addMsg(msg)
@@ -216,10 +266,18 @@ $(
                     li.dataset["userid"] = String(new_user.id)
                     li.textContent = new_user.name
                     $('#members').append(li)
+                    // Messaggio a video
+                    let message = infoMsg('info', "[JOINED] "
+                        +new_user.name)
+                    $("#messages").append(message)
                 })
                 socket.on("leave", leaving_user => {
                     let id = String(leaving_user.id)
                     $('#members li[data-userid="'+id+'"]').remove()
+                    // Messaggio a video
+                    let message = infoMsg('info', "[LEFT] "
+                        +leaving_user.name)
+                    $("#messages").append(message)
                 })
             })
         })

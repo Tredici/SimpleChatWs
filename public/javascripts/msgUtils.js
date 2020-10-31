@@ -4,6 +4,74 @@
  *  la creazione di nuovi messaggi   
  */
 
+/**
+ * 
+ * @param {*} ts 
+ */
+function timeString(ts) {
+    return ts.getDate()+"/"+(ts.getMonth()+1)
+        +"/"+ts.getFullYear()+" "
+        +ts.getHours()+":"+ts.getMinutes()+":"
+        +ts.getSeconds()
+}
+
+/**
+ * Realizza un div contenente un messaggio
+ * 
+ * @param {string} type 
+ * @param {string} msg 
+ */
+function infoMsg(type, msg) {
+    type = type.toLowerCase()
+    /** Contenitore per allineare il messaggio di
+     *  avvertimento
+     */
+    let div = document.createElement('div')
+    div.classList.add("info-msg-container", "text-center",
+        "mt-2", "mb-2")
+    let msgDiv = document.createElement('div')
+    msgDiv.classList.add("info-msg", 'rounded', 'm-auto')
+    div.append(msgDiv)
+    let content = document.createElement('p')
+    msgDiv.append(content)
+    
+    /** Intestazione del messaggio
+     */
+    let typeSpan = document.createElement('span')
+    typeSpan.classList.add("info-msg-type")
+    switch(type) {
+        case "info":
+            msgDiv.classList.add('bg-info', 'text-white')
+            typeSpan.textContent = '[INFO]: '
+            break
+        case "success":
+            msgDiv.classList.add('bg-success', 'text-white')
+            typeSpan.textContent = '[SUCCESS]: '
+            break
+        case "warning":
+            msgDiv.classList.add('bg-warning', 'text-dark')
+            typeSpan.textContent = '[WARNING]: '
+            break
+        case "error":
+            msgDiv.classList.add('bg-danger', 'text-white')
+            typeSpan.textContent = '[ERROR]: '
+            break
+        default:
+            throw new Error("Invalid info message type")
+    }
+    content.append(typeSpan)
+    /** Inserisce il messaggio di avvertimento
+     */
+    let textMsg = document.createTextNode(msg)
+    content.append(textMsg)
+    let timeMsg = document.createElement('span')
+    timeMsg.classList.add("info-msg-time")
+    timeMsg.textContent = ' [' + timeString(new Date()) + ']'
+    content.append(timeMsg)
+            
+    return div
+}
+
 /** Dato che Blob e file non si possono trasmettere naturalmente
  *  Socket.io questa funzione serve a convertirli in oggetti 
  *  "equivalenti" che ne contengono il contenuto in ArrayBuffer
@@ -136,9 +204,7 @@ function addMsg(msg) {
         let timestamp = document.createElement("span")
         timestamp.classList.add("float-right", "ts-msg", "small")
         let ts = new Date(msg.msg.ts_send)
-        timestamp.textContent = ts.getDate()+"/"+(ts.getMonth()+1)
-            +"/"+ts.getFullYear()+" "
-            +ts.getHours()+":"+ts.getMinutes()+":"+ts.getSeconds()
+        timestamp.textContent = timeString(ts)
         divMsg.append(timestamp)
     }
     
