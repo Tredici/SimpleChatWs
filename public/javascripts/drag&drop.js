@@ -50,11 +50,18 @@ function buildArrow(carouselID, direction) {
  */
 function buildCarouselItem(image) {
     let item = document.createElement('div')
-    item.classList.add("carousel-item")
+    item.classList.add("carousel-item", 'h-100')
+    // Contenitore dell'immagine
+    let imgContainer = document.createElement('div')
+    imgContainer.classList.add('w-100', 'd-block', 
+        'bg-dark', 'text-center', 'h-100')
+    item.append(imgContainer)
+    // Immagine
     let img = document.createElement('img')
+    img.classList.add('m-auto', 'mh-100', 
+        'd-inline-block', 'mw-100', 'align-middle')
     img.src = URL.createObjectURL(image)
-    img.classList.add('w-100', 'd-block')
-    item.append(img)
+    imgContainer.append(img)
     return item
 }
 
@@ -74,6 +81,7 @@ function buildCarousel(images) {
 
     let carInner = document.createElement('div')
     carInner.classList.add("carousel-inner")
+    carInner.style.height = "5cm"
     carDiv.append(carInner)
 
     /** Riempimento con le immagini
