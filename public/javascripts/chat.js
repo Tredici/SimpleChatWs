@@ -2,7 +2,7 @@ const data = {}
 const socket = io()
 
 let audio_msg = undefined
-let pic_msg = []
+let pic_msg = undefined
 $(
     async () => {
 
@@ -134,7 +134,7 @@ $(
                     /** Reset dell'elemento riferimento per le
                      *  collezioni
                      */
-                    pic_msg = []
+                    pic_msg = undefined
                     /**
                      * Crea un nuovo bottone per le registrazioni
                      */
