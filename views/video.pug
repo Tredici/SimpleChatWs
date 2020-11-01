@@ -2,12 +2,15 @@ extends layout
 
 block scripts
     link(rel='stylesheet', href='/stylesheets/tests/video.css')
+    script(src="/socket.io/socket.io.js")
     script(src="/javascripts/tests/video.js" type="text/javascript")
 
 block content
   h1= title
   p Welcome to #{title}
 
-  video#video(src="", controls="")
+  //- Video dell'utente corrente
+  video#video.border.bg-dark(src="" autoplay muted)
+  video#videoOther.border.bg-dark(src="" autoplay)
 
-  button#avvia.btn.btn-info(type="button")
+  button#avvia.btn.btn-info(type="button") Avvia

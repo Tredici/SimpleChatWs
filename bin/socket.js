@@ -11,6 +11,39 @@ function sendAll(evNm, data) {
     }
 }
 
+function WRT(io) {
+    const RTCNamespace = io.of('/RTC')
+    RTCNamespace.on('connect', ws => {
+        ws.join('online', () => {
+            /**
+             * Per iniziare
+             */
+            ws.on('start', (data, done) => {
+                data.who = socket.id
+                console.log('start:', data)
+                ws.to('online').emit('new', data)
+                done("send")
+            })
+            /**
+             * Per rispondere
+             */
+            ws.on('accept', (data, done) => {
+                data.who = socket.id
+                console.log('accept:', data)
+                ws.to('online').emit('accepted', data)
+                done("Ready")
+            })
+            /**
+             * A quanto pare bisogna informare urbi
+             *  et orbi dei "candicati"
+             */
+            ws.on('candidate', candidate => {
+                ws.to('online').emit('candidate', candidate)
+            })
+        })
+    })
+}
+
 module.exports = function(http) {
     /**
      * contatore di connessione
@@ -18,6 +51,12 @@ module.exports = function(http) {
     let counter = 0
 
     let io = socket(http)
+    
+    /**
+     * Per sperimentare per la comunicazione real time
+     */
+    WRT(io)
+
     io.on('connection', (ws) => {
         /**
          * Aggiunge il collegamento al pool 
