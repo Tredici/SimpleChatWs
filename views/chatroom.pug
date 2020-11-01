@@ -1,0 +1,21 @@
+extends layout
+
+block scripts
+  link(rel='stylesheet', href='/stylesheets/chatroom.css')
+
+  script(src="/socket.io/socket.io.js")
+  script(src="/javascripts/chatroom.js" type="text/javascript")
+
+block content
+  header
+    h1= title
+    p Chatroom!
+
+  .container
+    video#video(autoplay muted)
+
+    #room(data-id=roomId)
+
+  //-
+    footer.footer
+      span Sito gestito da 13
