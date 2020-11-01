@@ -1,10 +1,25 @@
 const data = {}
 const socket = io()
+/** Per errori di connessione
+ */
+socket.on('connect_error', (error) => {
+    let message = infoMsg('error', "[connect_error] "
+        +error)
+    $("#start").append(message)
+})
+/** Per timeout nella connessione
+ */
+socket.on('connect_timeout', (timeout) => {
+    let message = infoMsg('error', "[connect_timeout] "
+        +timeout)
+    $("#start").append(message)
+})
 
 let audio_msg = undefined
+let pic_msg = undefined
 $(
     async () => {
-
+        
         $('#login').submit(e => {
             e.preventDefault()
             let name = $('#name').val()
@@ -12,16 +27,52 @@ $(
             $('form#login input').prop("disabled",true)
             $('form#login input[type="submit"]').remove()
             data.name = name
-
+            
             /**
              * Invia al server il proprio nome e riceve indietro l'elenco
              * di tutti gli utenti collegati al momento
              */
             socket.emit('logged', {name: name}, (users) => {
                 //  Da eseguire dopo il login
+                /**
+                 * Rende visibile la zona per per chattare
+                 */
                 $("main").removeClass('d-none')
                 /**
-                 * Per la ricezione di messaggi
+                 * Visualizza il messaggio che evidenzia che
+                 *  la connessione è stata stabilita
+                 */
+                let loginMessage = infoMsg('info', 'logged!')
+                $("#messages").append(loginMessage)
+                
+                /** Per avvertire che ci si è disconnessi
+                 */
+                socket.on('disconnect', (reason) => {
+                    let message = infoMsg('info', '[disconnected] '
+                        +reason)
+                    $("#messages").append(message)
+                })
+                /** Per i tentativi di riconnessione
+                 */
+                socket.on('reconnecting', (attemptNumber) => {
+                    let message = infoMsg('info', '[reconnecting] '
+                        +attemptNumber)
+                    $("#messages").append(message)
+                })
+                /** Per riconnessione fallita
+                 */
+                socket.on('reconnect_failed', () => {
+                    let message = infoMsg('info', '[reconnect_failed]')
+                    $("#messages").append(message)
+                })
+                /** Per errori nel funzionamento
+                 */
+                socket.on('error', (error) => {
+                    let message = infoMsg('error', "[error] "+error)
+                    $("#messages").append(message)
+                })
+
+                /** Per la ricezione di messaggi
                  */
                 socket.on('new-msg', msg => {
                     let msgDiv = addMsg(msg)
@@ -101,14 +152,39 @@ $(
                 }
                 initRecording()
                 
+                /** Per il drag&drop
+                 */
+                $('#chat-form').on("dragenter", e => e.preventDefault())
+                $('#chat-form').on("dragover", e => e.preventDefault())
+                $('#chat-form').on("drop", async e => {
+                    let form = e.currentTarget
+                    e.preventDefault()
+                    console.log(e)
+                    let draggedFiles = e.originalEvent.dataTransfer.files
+                    let imageFiles = []
+                    for(let f of draggedFiles) {
+                        if(!f.type.startsWith("image/")) continue
+                        imageFiles.push(f)
+                    }
+                    initCarousel(form, imageFiles)
+                    pic_msg = imageFiles
+                })
+
                 /**
                  * Per gestire il reset della form
                  */
                 $('#chat-form').on('reset', e => {
-                    /**
-                     * Reset dell'audio
+                    let form = e.currentTarget
+                    /** Reset del carousel
+                     */
+                    $(".carousel-space", form).empty()
+                    /** Reset dell'audio
                      */
                     audio_msg = undefined
+                    /** Reset dell'elemento riferimento per le
+                     *  collezioni
+                     */
+                    pic_msg = undefined
                     /**
                      * Crea un nuovo bottone per le registrazioni
                      */
@@ -139,35 +215,19 @@ $(
                      */
                     const filelist = $('#file-msg')[0].files
                     if(filelist.length) {
-                        data.files = []
-                        for(let fileToRead of filelist) {
-                            let reader = new FileReader()
-                            let fileBuffer = await new Promise((resolve, reject) => {
-                                reader.onload = function(evt) {
-                                    resolve([evt.target.result])
-                                }
-                                reader.onerror = reject
-                                reader.readAsArrayBuffer(fileToRead)
-                            })
-                            const file = {
-                                name: fileToRead.name,
-                                type: fileToRead.type,
-                                content: fileBuffer
-                            }
-                            /**
-                             * Aggiunge alla risposta il file appena caricato,
-                             * mi tengo tranquillo per un eventuale di invio di
-                             * più file insieme
-                             */
-                            data.files.push(file)
-                        }
-
+                        data.files = await makeFileEquivalentObject(filelist)
                     }
                     /**
                      * Per gestire le eventuali registrazioni audio
                      */
                     if(audio_msg) {
                         data.audio = audio_msg
+                    }
+
+                    /** Per gestire l'eventuale carousel di foto
+                     */
+                    if(pic_msg) {
+                        data.carousel = await makeFileEquivalentObject(pic_msg)
                     }
 
                     /**
@@ -206,10 +266,18 @@ $(
                     li.dataset["userid"] = String(new_user.id)
                     li.textContent = new_user.name
                     $('#members').append(li)
+                    // Messaggio a video
+                    let message = infoMsg('info', "[JOINED] "
+                        +new_user.name)
+                    $("#messages").append(message)
                 })
                 socket.on("leave", leaving_user => {
                     let id = String(leaving_user.id)
                     $('#members li[data-userid="'+id+'"]').remove()
+                    // Messaggio a video
+                    let message = infoMsg('info', "[LEFT] "
+                        +leaving_user.name)
+                    $("#messages").append(message)
                 })
             })
         })
