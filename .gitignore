@@ -73,3 +73,6 @@ https_certs/*
 # non sono legati al progetto in senso stretto
 help
 help/*
+
+# per escludere i file gestiti da vscode
+.vscode
