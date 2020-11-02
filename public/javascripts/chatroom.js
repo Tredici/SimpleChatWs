@@ -10,6 +10,8 @@ function addVideo(id, stream) {
     video.dataset.userid = id
     video.srcObject = stream
     $('#room').append(video)
+    if(video.paused)
+        video.play()
     return video
 }
 
@@ -76,6 +78,12 @@ const peers = new Map()
 async function onNew(data) {
     // nuovo
     let newUser = data.id
+    // inizia l'handshake
+    await startHandshake(newUser)
+}
+/** Per modularità
+ */
+async function startHandshake(newUser) {
     // inizia a preparare la connessione
     let P2P = new RTCPeerConnection(config, config2)
     // aggiunge il pari al gruppo
@@ -104,6 +112,7 @@ async function onNew(data) {
     sendTo(newUser, 'offer', {offer: requestToExcange}, 
         () => console.log('Offer sent'))
 }
+
 /** Per accettare un'offerta
  */
 socket.on("offer", async (who, data) => {
@@ -143,11 +152,10 @@ socket.on("offer", async (who, data) => {
  */
 socket.on("answer", async (who, data) => {
     let P2P = peers.get(who)
-    // lega il video
-    linkStream(who, P2P)
     await P2P.setRemoteDescription(
         new RTCSessionDescription(data.answer))
-        
+    // lega il video
+    linkStream(who, P2P)        
 })
 
 /** Prende il collegamento P2P e ne estrae
@@ -165,7 +173,7 @@ function linkStream(who, P2P) {
     // riempie lo stream
     rcvs.forEach(rcv => stream.addTrack(rcv.track))
     // aggiunge l'elemento audio
-    addVideo(who, stream)
+    return addVideo(who, stream)
 }
 
 
