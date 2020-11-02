@@ -15,7 +15,7 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/:roomId', (req, res) => {
-    res.remder('chatroom', {title: "chatroom", roomId: req.params.roomId})
+    res.render('chatroom', {title: "chatroom", roomId: req.params.roomId})
 })
 
 module.exports = router;

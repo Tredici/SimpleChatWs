@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "test": "npx nodemon ./bin/www"
+    "test": "HTTPS='' DEBUG='simplechatws:*' npx nodemon ./bin/www"
   },
   "dependencies": {
     "cookie-parser": "~1.4.4",

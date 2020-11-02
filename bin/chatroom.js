@@ -1,5 +1,7 @@
 "use strict"
 
+const debug = require('debug')('simplechatws:chatroom')
+
 /** Per la chatroom, io è l'oggetto base
  *  per gestire i websocket
  * 
@@ -8,7 +10,13 @@
 module.exports = function(io) {
     const nms = io.of('/chatroom')
 
+    let custom_id = 0
+    io.engine.generateId = (req) => {
+        return "custom_id_" + custom_id++; // custom id must be unique
+    }
+
     const rooms = new Map()
+    const users = new Map()
 
     nms.on('connect', (ws) => {
         
@@ -19,23 +27,33 @@ module.exports = function(io) {
             ws.join(room)
             let userId = ws.id
             let group
+            debug("join:", userId, room)
+            /** Lega un utente alla sua room
+             */
+            users.set(userId, room)
             /** Per comunicazione 1-1
              */
             ws.on('sendTo', (who, what, whit, done) => {
+                debug('sendTo:', who, what)
+                let userId = ws.id
+                let room = users.get(userId)
+                let group = rooms.get(room)
                 if(!group.has(who)) {
                     // il tipo è assente
                     console.error("Not found:",
-                        who, what, whit)
+                    who, what)
+                    debug("group:", ...group.keys())
                     done('404')
                 } else {
                     /** Invia solo al 
                      *  destinatario
                      */
                     let skt = group.get(who)
-                    skt.emit(what, whit)
+                    skt.emit(what, userId, whit)
                     done()
                 }
             })
+
             if(!rooms.has(room)) {
                 group = new Map()
                 rooms.set(room, group)
