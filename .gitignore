@@ -68,3 +68,8 @@ typings/
 # per i file certificato necessari ad usare https
 https_certs
 https_certs/*
+
+# per i file di appoggio (consultazione) che però
+# non sono legati al progetto in senso stretto
+help
+help/*

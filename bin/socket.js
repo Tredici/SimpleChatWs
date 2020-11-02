@@ -1,6 +1,9 @@
 "use strict"
 
+const path = require('path')
 const socket = require('socket.io')
+
+const chatroom = require(path.join(__dirname, "chatroom"))
 
 const users = new Map()
 
@@ -18,6 +21,11 @@ module.exports = function(http) {
     let counter = 0
 
     let io = socket(http)
+    // Inizializza il namespace
+    // per la chatroom (tutti online insieme)
+    chatroom(io)
+    // Inizializza il namespace principale per
+    // la chat principale
     io.on('connection', (ws) => {
         /**
          * Aggiunge il collegamento al pool 
