@@ -1,0 +1,25 @@
+extends layout
+
+block scripts
+    script(type="text/javascript").
+        $(
+            async () => {
+                let screen = await navigator.mediaDevices.getDisplayMedia()
+
+                let video = $('#screen')[0]
+                video.srcObject = screen
+                video.controls = true
+                video.play()
+                video.muted = true
+
+            }
+        )
+
+
+block content
+    header
+        h1= title
+        p Welcome to #{title}
+
+    .container
+        video#screen.bg-dark(src="")
