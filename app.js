@@ -7,7 +7,7 @@ var sassMiddleware = require('node-sass-middleware');
 
 //var indexRouter = require('./routes/index');
 //var usersRouter = require('./routes/users');
-var chatRouter = require('./routes/chat');
+var chatRouter = require(path.join(__dirname, 'routes','chat'));
 
 var app = express();
 

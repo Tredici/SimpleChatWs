@@ -5,9 +5,9 @@
  */
 
 let path = require('path')
-var app = require('../app');
+var app = require(path.join(__dirname, '..', 'app'));
 var debug = require('debug')('simplechatws:server');
-var socket = require('./socket');
+var socket = require(path.join(__dirname,'socket'));
 
 /**
  * Get port from environment and store in Express.
