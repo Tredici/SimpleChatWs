@@ -8,4 +8,6 @@ Il server che viene qui sviluppato non dovrebbe ricoprire quindi alcun ruolo di 
 
 Col tempo, si proverà a far sì di incentivare la possibilità di instaurare connessioni peer2peer tra gli utenti in modo da ridurre ancora di più il ruolo del server e limitare ulteriormente quindi le conoscenze sul tipo di cominicazione in corso trai peers.
 
+Al fine di limitare il più possibile la persistenza di informazioni su quanto viene fatto si desidera evitare anche l'utilizzo di cookie e dei vari "Storage" lato client offerti da HTML5: se un utente aprirà due finestre separate queste saranno indipendenti l'una dall'altra!
+
 Non so quanto crescerà ma è certo sarà una sfida interessante.
