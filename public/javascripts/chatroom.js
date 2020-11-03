@@ -184,6 +184,15 @@ socket.on("candidate", async (who, candidate) => {
     await P2P.addIceCandidate(new RTCIceCandidate(candidate))
 })
 
+/** Gestisce l'inizilizzazione del tutto
+ *  e l'eventuale interazione con l'utente
+ * 
+ */
+async function init() {
+    $("#bottone-audio").click(flipAudio)
+    $("#bottone-video").click(flipVideo)
+}
+
 $(async () => {
     roomId = $('#room').data('id')
 
@@ -191,7 +200,16 @@ $(async () => {
         audio: true,
         video: true
     })
+    
+    /** Inizializza il tutto e gestisce
+     *  l'eventuale interazione con l'utente
+     */
+    await init()
+    
+    /** Collega lo stream 
+     */
     $('video#video')[0].srcObject = stream
+
     /** Per quando si unisce uno nuovo
      */
     socket.on('new', onNew)

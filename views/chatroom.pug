@@ -4,6 +4,7 @@ block scripts
   link(rel='stylesheet', href='/stylesheets/chatroom.css')
 
   script(src="/socket.io/socket.io.js")
+  script(src="/javascripts/chatroom-management.js" type="text/javascript")
   script(src="/javascripts/chatroom.js" type="text/javascript")
 
 block content
@@ -17,6 +18,12 @@ block content
     video#video(autoplay muted)
 
     #room(data-id=roomId)
+
+  
+  #controls.fixed-bottom.text-center.border-top.border-info.bg-info
+    .btn-group.btn-group-lg.m-1(role="group")
+      button#bottone-audio.btn.btn-success(type="button") Audio
+      button#bottone-video.btn.btn-success(type="button") Video
 
   //-
     footer.footer
