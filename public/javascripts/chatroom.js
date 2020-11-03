@@ -6,6 +6,7 @@ const socket = io('/chatroom')
 
 function addVideo(id, stream) {
     let video = document.createElement('video')
+    video.classList.add('mw-100')
     video.controls = true
     video.dataset.userid = id
     video.srcObject = stream
