@@ -87,20 +87,41 @@ async function onNew(data) {
     // inizia l'handshake
     await startHandshake(newUser)
 }
+
+/** Costruisce un RTCPeerConnection
+ *  con tutte le configurazioni di
+ *  default desiderate
+ */
+function buildP2P(other) {
+    // inizia a preparare la connessione
+    let P2P = new RTCPeerConnection(config, config2)
+    // questione degli candidati ICE
+    P2P.onicecandidate = event => {
+        if (event.candidate) {
+            console.log("candidate", other, event.candidate)
+            sendTo(other, "candidate", event.candidate, () => {})
+        }
+    }
+    P2P.onconnectionstatechange = event => {
+        console.log("connectionstatechange", other, P2P.connectionState)
+    }
+    P2P.onnegotiationneeded = event => {
+        console.log("negotiationneeded", other, P2P)
+    }
+    P2P.ondatachannel = event => {
+        let channel = event.channel
+        console.log("datachannel", other, channel)
+    }
+    return P2P
+}
+
 /** Per modularità
  */
 async function startHandshake(newUser) {
     // inizia a preparare la connessione
-    let P2P = new RTCPeerConnection(config, config2)
+    let P2P = buildP2P(newUser)
     // aggiunge il pari al gruppo
     peers.set(newUser, P2P)
-    // questione degli candidati ICE
-    P2P.onicecandidate = event => {
-        if (event.candidate) {
-            console.log("candidate", event.candidate)
-            sendTo(newUser, "candidate", event.candidate, () => {})
-        }
-    }
     /** Bisogna attaccare gli stream per la trasmissione
      */
     stream.getTracks().forEach(
@@ -126,15 +147,9 @@ socket.on("offer", async (who, data) => {
      *  di comunicazione verso l'offerente
      */
     // se lo crea
-    let P2P = new RTCPeerConnection(config, config2)
+    let P2P = buildP2P(who)
     // lo aggiunge al gruppo
     peers.set(who, P2P)
-    P2P.onicecandidate = event => {
-        if (event.candidate) {
-            console.log("candidate", event.candidate)
-            sendTo(who, "candidate", event.candidate, () => {})
-        }
-    }
     // attacca gli stream
     stream.getTracks().forEach(
         track => P2P.addTrack(track, stream)
