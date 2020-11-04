@@ -5,15 +5,20 @@
 const socket = io('/chatroom')
 
 function addVideo(id, stream) {
+    let viDiv = document.createElement('div')
+    viDiv.classList.add('mw-100', "w-xl-25",
+        "w-lg-50", "embed-responsive",
+        "embed-responsive-4by3")
+    viDiv.dataset.userid = id
     let video = document.createElement('video')
-    video.classList.add('mw-100')
+    video.classList.add("embed-responsive-item")
     video.controls = true
-    video.dataset.userid = id
     video.srcObject = stream
-    $('#room').append(video)
+    viDiv.append(video)
+    $('#room').append(viDiv)
     if(video.paused)
         video.play()
-    return video
+    return viDiv
 }
 
 function removeVideo(id) {
