@@ -114,12 +114,16 @@ function buildP2P(other) {
     }
     return P2P
 }
-
+let dataChannel
 /** Per modularità
  */
 async function startHandshake(newUser) {
     // inizia a preparare la connessione
     let P2P = buildP2P(newUser)
+    dataChannel = P2P.createDataChannel("messages", {
+        protocol: "TCP"
+    })
+
     // aggiunge il pari al gruppo
     peers.set(newUser, P2P)
     /** Bisogna attaccare gli stream per la trasmissione
