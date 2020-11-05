@@ -166,6 +166,10 @@ $(
                         if(!f.type.startsWith("image/")) continue
                         imageFiles.push(f)
                     }
+                    /**
+                     * Se non ci sono immagini non fa nulla
+                     */
+                    if(imageFiles.length === 0) return
                     initCarousel(form, imageFiles)
                     pic_msg = imageFiles
                 })
