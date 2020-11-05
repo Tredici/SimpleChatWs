@@ -204,32 +204,50 @@ $(
                     e.preventDefault()
                     let form = e.currentTarget
                     /**
+                     * Contiene i dati da inviare
+                     */
+                    let data = {}
+                    /**
+                     * vale true se l'utente ha effetivamente inserito 
+                     * dei contenuti nella form da inviare, se false
+                     * non invia nulla
+                     */
+                    let ready = false
+                    /**
                      * Per trasferire il testo
                      */
                     let text_msg = $('#text-msg').val().trim()
-                    let data = {
-                        text: text_msg
+                    if(text_msg) {
+                        ready |= true
+                        data.text = text_msg
                     }
                     /**
                      * Per gli eventuali file allegati
                      */
                     const filelist = $('#file-msg')[0].files
                     if(filelist.length) {
+                        ready |= true
                         data.files = await makeFileEquivalentObject(filelist)
                     }
                     /**
                      * Per gestire le eventuali registrazioni audio
                      */
                     if(audio_msg) {
+                        ready |= true
                         data.audio = audio_msg
                     }
-
+                    
                     /** Per gestire l'eventuale carousel di foto
                      */
                     if(pic_msg) {
+                        ready |= true
                         data.carousel = await makeFileEquivalentObject(pic_msg)
                     }
 
+                    /**
+                     * Se non ci sono contenuti non invia nulla
+                     */
+                    if(!ready) return
                     /**
                      * Timestamp inoltro
                      */
